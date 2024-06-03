@@ -388,9 +388,19 @@ private:
 
 
 		float dx = ball2.xPos - ball1.xPos;
+
+		if (dx > ball2.radius + ball1.radius) { // Leave early because ball is far away horizontally
+			return;
+		}
+
 		float dy = ball2.yPos - ball1.yPos;
-		float distanceSq = dx * dx + dy * dy;
-		float minDistance = ball1.radius + ball2.radius;
+
+		if (dy > ball2.radius + ball1.radius) { // Leave early because ball is far away vertically
+			return;
+		}
+
+		const float& distanceSq = dx * dx + dy * dy;
+		const float& minDistance = ball1.radius + ball2.radius;
 
 		if (distanceSq < minDistance * minDistance) {
 			// std::cout << "Collision detected between balls!\n";
@@ -406,18 +416,18 @@ private:
 			ball1.setPosition(ball1.xPos - displacementX, ball1.yPos - displacementY);
 			ball2.setPosition(ball2.xPos + displacementX, ball2.yPos + displacementY);
 
-			// Check if balls are still overlapping
-			dx = ball2.xPos - ball1.xPos;
-			dy = ball2.yPos - ball1.yPos;
-			distanceSq = dx * dx + dy * dy;
-			overlap = 0.25f * (minDistance * minDistance - distanceSq);
 
-			if (distanceSq < 0.25) {
-				distance = std::sqrt(distanceSq);
+			if (ball1.getPosition() == ball2.getPosition()) {
+				// Check if balls are still overlapping
+				dx = ball2.xPos - ball1.xPos;
+				dy = ball2.yPos - ball1.yPos;
+				distance = std::sqrt(dx * dx + dy * dy);
+				overlap = 0.5f * (minDistance - distance);
+
 				// If balls are still overlapping, further adjust their positions
 				const float& adjustX = (overlap + ball1.radius / 2) * (dx / distance);
 				const float& adjustY = (overlap + ball1.radius / 2) * (dy / distance);
-
+				
 				ball1.setPosition(ball1.xPos - adjustX, ball1.yPos - adjustY);
 				ball2.setPosition(ball2.xPos + adjustX, ball2.yPos + adjustY);
 			}
